@@ -1,0 +1,11 @@
+python main_cifar.py \
+--e_dim_z 8 \
+--g_pos_kappa 16 \
+--e_post_kappa_min 16 \
+--e_post_kappa_max 16 \
+--l_n_samples 128 \
+--bs 128 \
+--n_neg 32 \
+--loss MCInfoNCE \
+--n_phases 1 \
+--seed 1

@@ -1,0 +1,12 @@
+python main_cifar.py \
+--e_dim_z 8 \
+--g_pos_kappa 64 \
+--e_post_kappa_min 64 \
+--e_post_kappa_max 64 \
+--l_n_samples 128 \
+--bs 128 \
+--traindata train_hardlabels \
+--n_neg 0 \
+--loss MCInfoNCE \
+--n_phases 1 \
+--seed 1

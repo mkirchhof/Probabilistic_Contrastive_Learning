@@ -1,0 +1,13 @@
+python main_cifar.py \
+--e_dim_z 8 \
+--g_pos_kappa 32 \
+--e_post_kappa_min 32 \
+--e_post_kappa_max 32 \
+--l_n_samples 128 \
+--bs 128 \
+--n_neg 0 \
+--loss HedgedInstance \
+--n_phases 1 \
+--l_hib_a 2 \
+--l_hib_b 1 \
+--seed 1
