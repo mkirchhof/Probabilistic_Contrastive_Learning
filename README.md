@@ -8,11 +8,11 @@ Michael Kirchhof, Enkelejda Kasneci, Seong Joon Oh
 
 _Contrastively trained encoders have recently been proven to invert the data-generating process: they encode each input, e.g., an image, into the true latent vector that generated the image (Zimmermann et al., 2021). However, real-world observations often have inherent ambiguities. For instance, images may be blurred or only show a 2D view of a 3D object, so multiple latents could have generated them. This makes the true posterior for the latent vector probabilistic with heteroscedastic uncertainty. In this setup, we extend the common InfoNCE objective and encoders to predict latent distributions instead of points. We prove that these distributions recover the correct posteriors of the data-generating process, including its level of aleatoric uncertainty, up to a rotation of the latent space. In addition to providing calibrated uncertainty estimates, these posteriors allow the computation of credible intervals in image retrieval. They comprise images with the same latent as a given query, subject to its uncertainty._
 
-**Link**:
+**Link**: https://arxiv.org/abs/2302.02865
 
 ---
 ### Installation
-This code was tested on python 3.8. Use the code below to create a fitting conda environment.
+This code was tested on Python 3.8. Use the code below to create a fitting conda environment.
 
 ```commandline
 conda create --name probcontrlearning python=3.8
@@ -63,10 +63,10 @@ If you want obtain probabilistic embeddings for your own contrastive learning pr
 
 ### How to Cite:
 ```
-@inproceedings{kirchhof2023probabilistic,
+@article{kirchhof2023probabilistic,
+  author={Kirchhof, Michael and Kasneci, Enkelejda and Oh, Seong Joon},
   title={Probabilistic Contrastive Learning Recovers the Correct Aleatoric Uncertainty of Ambiguous Inputs},
-  author={Michael Kirchhof and Enkelejda Kasneci and Seong Joon Oh},
-  booktitle={Arxiv submission},
+  journal={arXiv preprint arXiv:2302.02865},
   year={2023}
 }
 ```
