@@ -117,7 +117,7 @@ def create_well_conditioned_generator(args):
         # Create a new generator candidate
         gen = Generator(dim_x=args.g_dim_x, dim_hidden=args.g_dim_hidden, dim_z=args.g_dim_z, n_hidden=args.g_n_hidden,
                         pos_kappa=args.g_pos_kappa, post_kappa_min=args.g_post_kappa_min, post_kappa_max=args.g_post_kappa_max,
-                        family=args.g_post_family)
+                        family=args.g_post_family, has_joint_backbone=args.has_joint_backbone)
 
         # Measure how much space in the latent space it fills
         samples = gen._sample_x(1000)
@@ -134,7 +134,7 @@ def get_loss(args):
     elif args.loss == "HedgedInstance":
         loss = HedgedInstance(kappa_init=args.l_hib_a, n_samples=args.l_n_samples, b_init=args.l_hib_b)
     else:
-        raise(f"loss {args.loss} is not implemented.")
+        raise NotImplementedError(f"loss {args.loss} is not implemented.")
 
     return loss
 
@@ -146,7 +146,8 @@ if __name__=="__main__":
     loss = get_loss(args)
     gen = create_well_conditioned_generator(args)
     enc = Encoder(dim_x=args.g_dim_x, dim_hidden=args.e_dim_hidden, dim_z=args.e_dim_z, n_hidden=args.e_n_hidden,
-                  post_kappa_min=args.e_post_kappa_min, post_kappa_max=args.e_post_kappa_max, x_samples=gen._sample_x(1000))
+                  post_kappa_min=args.e_post_kappa_min, post_kappa_max=args.e_post_kappa_max, x_samples=gen._sample_x(1000),
+                  has_joint_backbone=args.has_joint_backbone)
 
     # Clean up the output folder
     os.makedirs("results", exist_ok=True)

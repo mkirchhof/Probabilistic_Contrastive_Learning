@@ -30,6 +30,7 @@ def get_args():
     parser.add_argument('--g_post_kappa_min', default=16, type=float, help='How concentrated GT posteriors should be at least. (Use float("Inf") for the crisp case)')
     parser.add_argument('--g_post_kappa_max', default=32, type=float, help='How concentrated GT posteriors should be at most. (Use float("Inf") for the crisp case)')
     parser.add_argument('--g_min_spread', default=0.5, type=float, help='How much area of the sphere the generator needs to span to be accepted (measured by maximum cosine distance between means). Default 1 accepts any generator.')
+    parser.add_argument('--has_joint_backbone', default=False, type=str2bool, help="Whether the kappa and mu functions should share the same backbone or be independent.")
 
     ##### Encoder Parameters
     parser.add_argument('--e_dim_z', default=10, type=int, help='Dimensionality of latent space.')

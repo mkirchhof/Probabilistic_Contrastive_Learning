@@ -5,7 +5,7 @@ from utils.utils import construct_mlp
 class Encoder(nn.Module):
     def __init__(self, n_hidden=2, dim_x=10, dim_z=2, dim_hidden=32,
                  post_kappa_min=20, post_kappa_max=80, x_samples=None,
-                 device=torch.device('cuda:0')):
+                 device=torch.device('cuda:0'), has_joint_backbone=False):
         super().__init__()
 
         # Save parameters
@@ -16,8 +16,9 @@ class Encoder(nn.Module):
         self.dim_z = dim_z
 
         # Create networks
+        self.has_joint_backbone = has_joint_backbone
         self.mu_net = construct_mlp(n_hidden=n_hidden, dim_x=dim_x, dim_z=dim_z, dim_hidden=dim_hidden)
-        self.kappa_net = construct_mlp(n_hidden=n_hidden, dim_x=dim_x, dim_z=1, dim_hidden=dim_hidden)
+        self.kappa_net = construct_mlp(n_hidden=n_hidden, dim_x=dim_x if not has_joint_backbone else dim_z, dim_z=1, dim_hidden=dim_hidden)
         self.mu_net = self.mu_net.to(device)
         self.kappa_net = self.kappa_net.to(device)
 
@@ -37,7 +38,7 @@ class Encoder(nn.Module):
         # Return posterior (z-space) means and kappas for a batch of x
         mu = self.mu_net(x)
         mu = mu / torch.norm(mu, dim=-1).unsqueeze(-1)
-        kappa = torch.exp(self.kappa_upscale * torch.log(1 + torch.exp(self.kappa_net(x))) + self.kappa_add)
+        kappa = torch.exp(self.kappa_upscale * torch.log(1 + torch.exp(self.kappa_net(x if not self.has_joint_backbone else mu))) + self.kappa_add)
         return mu, kappa
 
     def _rescale_kappa(self, x_samples=None):
