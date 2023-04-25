@@ -309,12 +309,12 @@ def resnet50(pretrained=False, progress=True, device="cpu", **kwargs):
 
 
 class ResnetProbEncoder(nn.Module):
-    def __init__(self, dim_z=10, post_kappa_min=20, post_kappa_max=80, device=torch.device("cuda:0")):
+    def __init__(self, dim_z=10, post_kappa_min=20, post_kappa_max=80, device=torch.device("cuda:0"), pretrained=True):
         super().__init__()
         self.device = device
 
         # Load a pretrained ResNet18 backend
-        self.backend = resnet18(pretrained=True)
+        self.backend = resnet18(pretrained=pretrained)
         self.backend = self.backend.to(self.device)
 
         # Add a layer that casts down the resnet embeddings to dim_z dimensions

@@ -3,6 +3,7 @@ from tqdm import tqdm
 from arguments import get_args
 from utils.utils import init_seeds, init_wandb
 from utils.metrics import eval_cifar
+from utils.scheduler import WarmupCosineLR
 import torch
 import os
 import json
@@ -29,8 +30,12 @@ def train_loop(args, gen, enc, loss, gen_val):
                 params = list(enc.parameters())
                 if args.l_learnable_params:
                     params += list(loss.parameters())
-                optim = torch.optim.Adam(params, lr=args.lr)
-                scheduler = StepLR(optim, step_size=args.n_batches_per_half_phase, gamma=args.lr_decrease_after_phase)
+                optim = torch.optim.AdamW(params, lr=args.lr)
+                if args.pretrained:
+                    scheduler = StepLR(optim, step_size=args.n_batches_per_half_phase, gamma=args.lr_decrease_after_phase)
+                else:
+                    # Use an lr scheduler better suited for starting from scratch
+                    scheduler = WarmupCosineLR(optim, warmup_epochs = 0.2 * n_total_batches, max_epochs=n_total_batches)
                 # Use repeated mu when training kappa
                 n_neg = args.n_neg
                 training_phase = "joint"
@@ -43,8 +48,12 @@ def train_loop(args, gen, enc, loss, gen_val):
                     params = list(enc.parameters())
                     if args.l_learnable_params:
                         params += list(loss.parameters())
-                    optim = torch.optim.Adam(params, lr=lr)
-                    scheduler = StepLR(optim, step_size=args.n_batches_per_half_phase, gamma=args.lr_decrease_after_phase)
+                    optim = torch.optim.AdamW(params, lr=lr)
+                    if args.pretrained:
+                        scheduler = StepLR(optim, step_size=args.n_batches_per_half_phase, gamma=args.lr_decrease_after_phase)
+                    else:
+                        # Use an lr scheduler better suited for starting from scratch
+                        scheduler = WarmupCosineLR(optim, warmup_epochs = 0.2 * n_total_batches / 2, max_epochs=n_total_batches / 2)
                     # Use single n when training mu
                     n_neg = 0
                     training_phase = "mu"
@@ -53,8 +62,12 @@ def train_loop(args, gen, enc, loss, gen_val):
                     params = list(enc.parameters())
                     if args.l_learnable_params:
                         params += list(loss.parameters())
-                    optim = torch.optim.Adam(params, lr=lr)
-                    scheduler = StepLR(optim, step_size=args.n_batches_per_half_phase, gamma=args.lr_decrease_after_phase)
+                    optim = torch.optim.AdamW(params, lr=lr)
+                    if args.pretrained:
+                        scheduler = StepLR(optim, step_size=args.n_batches_per_half_phase, gamma=args.lr_decrease_after_phase)
+                    else:
+                        # Use an lr scheduler better suited for starting from scratch
+                        scheduler = WarmupCosineLR(optim, warmup_epochs = 0.2 * n_total_batches / 2, max_epochs=n_total_batches / 2)
                     # Use repeated mu when training kappa
                     n_neg = args.n_neg
                     training_phase = "kappa"
@@ -156,7 +169,7 @@ if __name__ == "__main__":
     loss = get_loss(args)
     gen = get_traindata(args)
     gen_val = ContrastiveCifar(mode="val", seed=args.seed, batch_size=args.bs)
-    enc = ResnetProbEncoder(dim_z=args.e_dim_z, post_kappa_min=args.e_post_kappa_min, post_kappa_max=args.e_post_kappa_max)
+    enc = ResnetProbEncoder(dim_z=args.e_dim_z, post_kappa_min=args.e_post_kappa_min, post_kappa_max=args.e_post_kappa_max, pretrained=args.pretrained)
 
     # Clean up the output folder
     if args.train:

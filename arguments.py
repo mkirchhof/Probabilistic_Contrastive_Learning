@@ -43,13 +43,14 @@ def get_args():
     parser.add_argument('--lr', default=1e-4, type=float, help='Learning Rate for network parameters.')
     parser.add_argument('--n_phases', default=1, type=int, help='If 0, train kappa and mu together for 2 * n_batces_per_half_phase batches. Otherwise, do n_phases of split training, each training first mu and then kappa.')
     parser.add_argument('--n_batches_per_half_phase', default=50000, type=int, help='Number of training epochs per half phase (i.e. per mu and per kappa)')
-    parser.add_argument('--lr_decrease_after_phase', default=0.1, type=float, help="Factor to multiply lr by after each half phase.")
+    parser.add_argument('--lr_decrease_after_phase', default=0.5, type=float, help="Factor to multiply lr by after each half phase.")
     parser.add_argument('--bs', default=128, type=int, help='Mini-Batchsize to use.')
     parser.add_argument('--seed', default=1, type=int, help='Random seed for reproducibility.')
     parser.add_argument('--n_neg', default=16, type=int, help='Number of negative samples per image. If 0, use rolled batch as negative samples.')
     parser.add_argument('--oversampling_factor', default=10, type=int, help="How many candidates to generate per wanted rejection sample (higher=faster, but more RAM)")
     # For CIFAR experiment
     parser.add_argument('--traindata', default="test_softlabels", type=str, help="Which training data to use. train_hardlabels uses the normal CIFAR-10 train set. test_hardlabels a subset of the CIFAR-10 test set. test_softlabels a subset of the CIFAR-10H soft label test set.")
+    parser.add_argument('--pretrained', default=True, type=str2bool, help="Whether to use ResNet-18 weights pretrained on CIFAR-10 for faster convergence.")
 
     ##### Loss parameters
     parser.add_argument('--loss', default="MCInfoNCE", type=str, help="Which loss (MCInfoNCE, ELK, HedgedInstance)")
