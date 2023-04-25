@@ -169,10 +169,16 @@ class ContrastiveCifarHard(ContrastiveCifar):
 
 
 class ContrastiveCifarHardTrain(ContrastiveCifar):
-    def __init__(self, mode="train", batch_size=64, device=torch.device("cuda:0")):
+    def __init__(self, mode="train", batch_size=64, device=torch.device("cuda:0"), random_augs=False):
         super().__init__(mode=mode, batch_size=batch_size, device=device)
 
         # Load data
+        if random_augs:
+            self.transform = transforms.Compose(
+                [transforms.RandomCrop(32, padding=4),
+                 transforms.RandomHorizontalFlip(),
+                 transforms.ToTensor(),
+                 transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2471, 0.2435, 0.2616])])
         self.data = datasets.CIFAR10(root='data/data_CIFAR10_test', train=True, download=True, transform=self.transform)
         self.plabels = torch.zeros((len(self.data.targets), 10))
         self.plabels.scatter_(dim=1, index=torch.Tensor(self.data.targets).type(torch.long).unsqueeze(1), value=1.)

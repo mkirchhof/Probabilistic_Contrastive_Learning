@@ -154,7 +154,7 @@ def get_traindata(args):
     elif args.traindata == "test_hardlabels":
         gen = ContrastiveCifarHard(mode="train", seed=args.seed, batch_size=args.bs)
     elif args.traindata == "train_hardlabels":
-        gen = ContrastiveCifarHardTrain(mode="train", batch_size=args.bs)
+        gen = ContrastiveCifarHardTrain(mode="train", batch_size=args.bs, random_augs=not args.pretrained)
     else:
         raise NotImplementedError("traindata is not implemented.")
 
