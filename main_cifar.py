@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
         gen_test = ContrastiveCifar(mode="test", seed=args.seed, batch_size=args.bs)
         r1, mapr, rcorr_entropy, r1_corrupt, mapr_corrupt, rcorr_corrupt = \
-            eval_cifar(args, enc, gen_test.get_dataloader(), make_lossy_dataloader(gen_test.data),  "testset", True)
+            eval_cifar(args, enc, gen_test.get_dataloader(), make_lossy_dataloader(gen_test.data),  "testset", False)
         results_dict = {"r1": r1,
                         "mapr": mapr,
                         "rcorr_entropy": rcorr_entropy,

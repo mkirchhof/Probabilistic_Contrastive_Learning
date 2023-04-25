@@ -85,7 +85,7 @@ def train_loop(args, gen, enc, loss):
                 avg_loss = running_loss / args.eval_every
             print(f'Loss: {avg_loss}')
             enc.eval()
-            cosdist_mse, cosdist_corr, cosdist_rankcorr, kappa_mse, kappa_corr, kappa_rankcorr = numerical_eval(args, gen, enc, eval_set)
+            cosdist_mse, cosdist_corr, cosdist_rankcorr, kappa_mse, kappa_corr, kappa_rankcorr = numerical_eval(args, gen, enc, eval_set, eval_std_instead_of_param=args.eval_std_instead_of_param)
             if args.n_graphical_eval > 0:
                 graphical_eval(args, gen, enc, eval_set[:args.n_graphical_eval], print_examples=b == n_total_batches - 1)
                 plt.suptitle(f'After {b} batches: Loss={avg_loss:.4f}. Cosdist MSE={cosdist_mse:.3f} (cor={cosdist_corr:.3f}). Kappa MSE={kappa_mse:.3f} (cor={kappa_corr:.3f}).')

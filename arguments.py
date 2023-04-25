@@ -62,6 +62,7 @@ def get_args():
     ##### Test parameters
     parser.add_argument('--eval_every', default=500, type=int, help="After how many batches to evaluate during training.")
     parser.add_argument('--n_numerical_eval', default=10000, type=int, help="On how many x-samples should posteriors be numerically evaluated.")
+    parser.add_argument('--eval_std_instead_of_param', default=True, type=str2bool, help="Turn this to true if you want to compare non-vMF generators to vMF encoders")
     parser.add_argument('--n_graphical_eval', default=400, type=int, help="On how many x-samples should posteriors be graphically evaluated. (this might take a long time for high numbers) 0 to turn off.")
     parser.add_argument('--savefolder', default="test", type=str, help="Where to save the results")
     # for CIFAR experiment

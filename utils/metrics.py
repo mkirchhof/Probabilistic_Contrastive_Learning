@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from utils.vmf_sampler import VonMisesFisher
+from torch.distributions.normal import Normal
+from torch.distributions.laplace import Laplace
 from utils.utils import pairwise_cos_sims, pairwise_l2_dists
 from scipy.stats import spearmanr
 from abc import abstractmethod, ABC
@@ -49,7 +51,7 @@ def eval_generator_smoothness(gen, ax=None):
     ax.set_title(f'corr={corr}')
 
 
-def numerical_eval(args, gen, enc, x_eval=None, print_results=True):
+def numerical_eval(args, gen, enc, x_eval=None, print_results=True, eval_std_instead_of_param=False):
     def mse(a, b):
         return torch.mean(torch.sqrt((a - b)**2))
 
@@ -58,6 +60,17 @@ def numerical_eval(args, gen, enc, x_eval=None, print_results=True):
             x_eval = gen._sample_x(args.n_eval)
         mu_enc, kappa_enc = enc(x_eval)
         mu_gen, kappa_gen = gen(x_eval)
+        if eval_std_instead_of_param:
+            if args.g_post_family == "vmf":
+                gen_samples = VonMisesFisher(mu_gen, kappa_gen).sample(100)
+            elif args.g_post_family == "Gaussian":
+                gen_samples = Normal(mu_gen, 1 / torch.sqrt(kappa_gen)).sample([100])
+            elif args.g_post_family == "Laplace":
+                gen_samples = Laplace(mu_gen, 1 / kappa_gen).sample([100])
+            enc_samples = VonMisesFisher(mu_enc, kappa_enc).sample(100)
+            gen_samples = torch.nn.functional.normalize(gen_samples, dim=-1)
+            kappa_enc = (enc_samples * mu_enc).sum(-1).abs().mean(0)
+            kappa_gen = (gen_samples * mu_gen).sum(-1).abs().mean(0)
 
     # Evaluate means.
     # We want them to be equal up to a rotation of the sphere.
