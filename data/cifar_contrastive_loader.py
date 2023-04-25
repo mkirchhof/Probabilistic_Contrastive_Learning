@@ -9,7 +9,7 @@ import os
 import json
 
 class ContrastiveCifar():
-    def __init__(self, mode="train", batch_size=64, device=torch.device("cuda:0")):
+    def __init__(self, mode="train", seed=1, batch_size=64, device=torch.device("cuda:0")):
         super().__init__()
         self.device = device
 
@@ -25,7 +25,19 @@ class ContrastiveCifar():
             raise FileNotFoundError("Could not find CIFAR-10H labels under " + plabels_path + ". Please download them (see README -> Installation).")
 
         # Limit to train/val/test
-        idxes = np.loadtxt(f"data/{mode}_idxes.csv", delimiter=",").astype("int")
+        # Each idx_set_i.csv contains 2000 image ids as crossvalidation splits of the original 10000 idxes.
+        # We use i = {seed, seed + 1, seed + 2} MOD 5 for train,
+        # i = seed + 3 MOD 5 for val
+        # i = seed + 4 MOD 4 for test
+        if mode == "train":
+            train_1 = np.loadtxt(f"data/idx_set_{seed % 5}.csv", delimiter=",").astype("int")
+            train_2 = np.loadtxt(f"data/idx_set_{(seed + 1) % 5}.csv", delimiter=",").astype("int")
+            train_3 = np.loadtxt(f"data/idx_set_{(seed + 2) % 5}.csv", delimiter=",").astype("int")
+            idxes = np.concatenate((train_1, train_2, train_3))
+        elif mode == "val":
+            idxes = np.loadtxt(f"data/idx_set_{(seed + 3) % 5}.csv", delimiter=",").astype("int")
+        elif mode == "test":
+            idxes = np.loadtxt(f"data/idx_set_{(seed + 4) % 5}.csv", delimiter=",").astype("int")
         self.data.data = self.data.data[idxes]
         self.plabels = self.plabels[idxes]
         self.len = self.plabels.shape[0]
@@ -142,8 +154,8 @@ class ContrastiveCifar():
 
 
 class ContrastiveCifarHard(ContrastiveCifar):
-    def __init__(self, mode="train", batch_size=64, device=torch.device("cuda:0")):
-        super().__init__(mode=mode, batch_size=batch_size, device=device)
+    def __init__(self, mode="train", seed=1, batch_size=64, device=torch.device("cuda:0")):
+        super().__init__(mode=mode, seed=seed, batch_size=batch_size, device=device)
 
         # Make softlabels hard
         for i in torch.arange(self.plabels.shape[0]):

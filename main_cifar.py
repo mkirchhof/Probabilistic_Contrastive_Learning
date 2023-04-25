@@ -137,9 +137,9 @@ def train_loop(args, gen, enc, loss, gen_val):
 
 def get_traindata(args):
     if args.traindata == "test_softlabels":
-        gen = ContrastiveCifar(mode="train", batch_size=args.bs)
+        gen = ContrastiveCifar(mode="train", seed=args.seed, batch_size=args.bs)
     elif args.traindata == "test_hardlabels":
-        gen = ContrastiveCifarHard(mode="train", batch_size=args.bs)
+        gen = ContrastiveCifarHard(mode="train", seed=args.seed, batch_size=args.bs)
     elif args.traindata == "train_hardlabels":
         gen = ContrastiveCifarHardTrain(mode="train", batch_size=args.bs)
     else:
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     init_seeds(args.seed)
     loss = get_loss(args)
     gen = get_traindata(args)
-    gen_val = ContrastiveCifar(mode="val", batch_size=args.bs)
+    gen_val = ContrastiveCifar(mode="val", seed=args.seed, batch_size=args.bs)
     enc = ResnetProbEncoder(dim_z=args.e_dim_z, post_kappa_min=args.e_post_kappa_min, post_kappa_max=args.e_post_kappa_max)
 
     # Clean up the output folder
@@ -178,7 +178,7 @@ if __name__ == "__main__":
         # Load best model
         enc.load_state_dict(torch.load(f"results/{args.savefolder}/encoder_params.pth"))
 
-        gen_test = ContrastiveCifar(mode="test", batch_size=args.bs)
+        gen_test = ContrastiveCifar(mode="test", seed=args.seed, batch_size=args.bs)
         r1, mapr, rcorr_entropy, r1_corrupt, mapr_corrupt, rcorr_corrupt = \
             eval_cifar(args, enc, gen_test.get_dataloader(), make_lossy_dataloader(gen_test.data),  "testset", True)
         results_dict = {"r1": r1,
